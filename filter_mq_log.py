@@ -33,7 +33,6 @@ if __name__ == '__main__':
         if not line:
             time.sleep(1.0)
             if loop:
-                print('.')
                 continue
             else:
                 break

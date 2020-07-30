@@ -13,7 +13,7 @@ log.addHandler(logging.StreamHandler(sys.stderr))
 
 
 class DetectAds:
-    def __init__(self, blacklist_urls: List[str]):
+    def __init__(self, blacklist_urls:               List[str]):
         itemset = self.load_blacklists(blacklist_urls)
         self.filter = itemset
 

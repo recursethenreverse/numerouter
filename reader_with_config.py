@@ -7,7 +7,18 @@ import getopt
 import pika
 import json
 
+type_application = "application"
+type_application_json = "application/json"
 
+type_img = ["image/gif",
+            "image/png",
+            "image/jpeg",
+            "image/webp",]
+
+type_media =["video/mp4",
+             "video/mpeg"]
+
+advert_url_keys = ['daca_images', 'googlesyndication']
 
 def read_log(file_name, rabbit_mq_host, queue_name, tail_log, read_full_log, clear_log_on_finish):
     # Set the filename and open the file
@@ -33,8 +44,20 @@ def read_log(file_name, rabbit_mq_host, queue_name, tail_log, read_full_log, cle
                 time.sleep(1)
                 file.seek(where)
             else:
-                print(line if line else None)  # already has newline
-                send_msg(line if line else 'NONE', rabbit_mq_host, queue_name)
+                if is_image(line if line else None):
+                    print(line if line else None)  # already has newline
+                    send_msg(line if line else 'NONE', rabbit_mq_host, queue_name)
+
+# this is verbose, I know
+def is_image(log_line):
+    if log_line is None:
+        return False            
+    log_line = str(log_line)  # only cast once
+    parts = log_line.split("|||") # only split once
+    if len(parts) > 4: 
+        if  parts[4].strip() in type_img: #trim as needed
+            return True
+    return False 
 
 
 def read_whole_log(file_name, rabbit_mq_host, queue_name):
@@ -44,10 +67,9 @@ def read_whole_log(file_name, rabbit_mq_host, queue_name):
             send_msg(line, rabbit_mq_host, queue_name)
 
 def clear_the_log_file(file_name):
-    if clear_log:
-        print("Clearing log file for read")
-        with open(file_name, 'w'):
-            pass
+    print("Clearing log file for read")
+    with open(file_name, 'w'):
+        pass
 
 
 def send_msg(msg, host, queue_name):

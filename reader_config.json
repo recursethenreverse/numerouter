@@ -1,0 +1,8 @@
+{
+    "host":"192.168.1.204",
+    "file_name":"/usr/local/squid/var/logs/sandbox2.log",
+    "queue_name":"adverts",
+    "read_full_log":"True",
+    "tail_file":"False",
+    "clear_log_on_finish":"True"
+}

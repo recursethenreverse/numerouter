@@ -64,7 +64,7 @@ def send_msg(msg, host, queue_name):
 
 
 if __name__ == "__main__":
-    with open('/usr/local/reader_config.json', 'r') as f:
+    with open('reader_config.json', 'r') as f:
         config = json.load(f)
         print(config)
         read_log(config['file_name'], 

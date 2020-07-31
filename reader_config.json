@@ -1,10 +1,10 @@
 {
-    "host":"192.168.1.52",
+    "host":"192.168.1.204",
     "user":"rabbit",
     "password":"rabbit",
-    "file_name":"/Users/bogdan.rybiy/work/url-filter/capture_1.log",
+    "file_name":"/usr/local/squid/var/logs/sandbox2.log",
     "read_full_log":"True",
-    "tail_file":"False",
+    "tail_file":"True",
     "clear_log_on_finish":"True",
     "queue_name":"adverts",
     "filtered_queue_name": "filtered_urls"

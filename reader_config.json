@@ -7,5 +7,6 @@
     "tail_file":"True",
     "clear_log_on_finish":"True",
     "queue_name":"adverts",
+    "queue_name_json":"adverts_json",
     "filtered_queue_name": "filtered_urls"
 }

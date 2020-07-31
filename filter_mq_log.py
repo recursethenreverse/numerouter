@@ -5,6 +5,16 @@ import sys
 from ad_detect import DetectAds
 from rmq import RMQiface
 
+from urllib.request import urlopen
+
+def is_ok_image(url: str) -> bool:
+    try:
+        site = urlopen(url)
+        meta = site.info()  # get header of the http request
+        return meta['content-type'].startswith('image') and int(meta['content-length']) > 1000
+    except Exception:
+        return False
+
 da = DetectAds([
     'https://raw.githubusercontent.com/hectorm/hmirror/master/data/adaway.org/list.txt',
     'https://raw.githubusercontent.com/hectorm/hmirror/master/data/adblock-nocoin-list/list.txt',
@@ -14,8 +24,12 @@ da = DetectAds([
 
 if __name__ == '__main__':
     loop = True
-    if len(sys.argv) > 1 and sys.argv[1] == '-once':
-        loop = False
+    img_filter = lambda url: True
+    for arg in sys.argv[1:]:
+        if arg == '-once':
+            loop = False
+        if arg == '-img':
+            img_filter = is_ok_image
 
     with open('reader_config.json', 'r') as f:
         config = json.load(f)
@@ -37,5 +51,5 @@ if __name__ == '__main__':
             else:
                 break
         fields = line.split(' ||| ')
-        if da.check(fields[3]):
+        if da.check(fields[3]) and img_filter(fields[3]):
             mq_writer.write(fields[3])

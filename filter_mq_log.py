@@ -11,7 +11,7 @@ def is_ok_image(url: str) -> bool:
     try:
         site = urlopen(url)
         meta = site.info()  # get header of the http request
-        return meta['content-type'].startswith('image') and int(meta['content-length']) > 1000
+        return int(meta['content-length']) > 10000
     except Exception:
         return False
 

@@ -1,5 +1,6 @@
 from urllib.request import urlopen
 from io import BytesIO
+import time
 
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -9,12 +10,12 @@ from rmq import RMQiface
 
 urls = [
     'https://cdn.revjet.com/s3/csp/1578955925683/shine.png',
+    'https://cdn.revjet.com/s3/csp/1578955925683/logo.svg',
     'https://tpc.googlesyndication.com/daca_images/simgad/13865403217536204307',
     'https://tpc.googlesyndication.com/daca_images/simgad/1948022358329940732?sqp=4sqPyQSWAUKTAQgAEhQNzczMPhUAAABAHQAAAAAlAAAAABgAIgoNAACAPxUAAIA_Kk8IWhABHQAAtEIgASgBMAY4A0CAwtcvSABQAFgAYFpwAngAgAEAiAEAkAEAnQEAAIA_oAEAqAEAsAGAreIEuAH___________8BxQEtsp0-MhoIvwMQ6gEYASABLQAAAD8wvwM46gFFAACAPw&rs=AOga4qmwNN2g28c_J8ehXFAoY4bOr7naGQ',
     'https://tpc.googlesyndication.com/simgad/12366423408132574325',
     'https://tpc.googlesyndication.com/simgad/3767484695346986263'
 ]
-
 
 
 class HiddenRoot(tk.Tk):
@@ -26,7 +27,7 @@ class HiddenRoot(tk.Tk):
         self.wm_geometry("0x0+0+0")
 
         self.window = MySlideShow(self)
-        self.window.nexti()
+        self.window.cycle()
 
 
 class MySlideShow(tk.Toplevel):
@@ -58,17 +59,26 @@ class MySlideShow(tk.Toplevel):
         self.label.pack(side="top", fill="both", expand=True)
 
 
+    def cycle(self):
+        while True:
+            self.nexti()
+            time.sleep(0.01)
+
     def nexti(self):
+        # import random
+        # url = random.choice(urls)
         url = self.mq.read()
         if url:
             try:
                 img = Image.open(BytesIO(urlopen(url).read()))
+                self.showImage(img)
+                print(f'INFO:\tshowing {url}')
             except Exception:
-                img = self.img_error
+                print(f'ERROR:\tnot a valid image: {url}')
         else:
-            img = self.img_none
+            print('INFO:\tQueue is empty')
+            time.sleep(1.0)
 
-        self.showImage(img)
 
 
     def showImage(self, image):
@@ -85,12 +95,13 @@ class MySlideShow(tk.Toplevel):
         # create new image
         self.persistent_image = ImageTk.PhotoImage(image)
         self.label.configure(image=self.persistent_image)
+        self.update()
 
 
 slideShow = HiddenRoot()
-slideShow.window.attributes('-fullscreen', True)
+# slideShow.window.attributes('-fullscreen', True)
 # slideShow.window.attributes('-topmost', True)
 slideShow.bind_all("<Escape>", lambda e: slideShow.destroy())
-slideShow.bind_all("<Return>", lambda e: slideShow.window.nexti()) # exit on esc
+# slideShow.bind_all("<Return>", lambda e: slideShow.window.nexti()) # exit on esc
 slideShow.update()
 slideShow.mainloop()

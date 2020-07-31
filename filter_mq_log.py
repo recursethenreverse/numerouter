@@ -24,12 +24,14 @@ da = DetectAds([
 
 if __name__ == '__main__':
     loop = True
-    img_filter = lambda url: True
+    img = False
+
     for arg in sys.argv[1:]:
         if arg == '-once':
             loop = False
         if arg == '-img':
-            img_filter = is_ok_image
+            img = True
+
 
     with open('reader_config.json', 'r') as f:
         config = json.load(f)
@@ -38,9 +40,19 @@ if __name__ == '__main__':
     usr = config['user']
     pwd = config['password']
     in_queue = config['queue_name']
-    out_queue = config['filtered_queue_name']
+
+    if img:
+        out_queue = config['filtered_images_queue_name']
+    else:
+        out_queue = config['filtered_queue_name']
+
     mq_reader = RMQiface(host, in_queue, usr, pwd)
     mq_writer = RMQiface(host, out_queue, usr, pwd)
+
+    if img:
+        img_filter = is_ok_image
+    else:
+        img_filter = lambda url: True
 
     while True:
         line = mq_reader.read()

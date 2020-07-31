@@ -6,7 +6,8 @@
     "read_full_log":"True",
     "tail_file":"True",
     "clear_log_on_finish":"True",
-    "queue_name":"adverts",
-    "queue_name_json":"adverts_json",
-    "filtered_queue_name": "filtered_urls"
+    "queue_name":"raw_images",
+    "queue_name_json":"raw_json",
+    "filtered_queue_name": "adverts",
+    "filtered_images_queue_name": "adverts_images"
 }

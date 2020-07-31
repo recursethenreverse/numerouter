@@ -40,7 +40,7 @@ class MySlideShow(tk.Toplevel):
         host = config['host']
         usr = config['user']
         pwd = config['password']
-        queue = config['filtered_queue_name']
+        queue = config['filtered_images_queue_name']
         self.mq = RMQiface(host, queue, usr, pwd)
         self.img_error = Image.open('error.png')
         self.img_none = Image.open('none.png')

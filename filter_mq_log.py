@@ -7,6 +7,7 @@ from rmq import RMQiface
 
 from urllib.request import urlopen
 
+
 def is_ok_image(url: str) -> bool:
     try:
         site = urlopen(url)
@@ -39,29 +40,38 @@ if __name__ == '__main__':
     host = config['host']
     usr = config['user']
     pwd = config['password']
-    in_queue = config['queue_name']
 
-    if img:
-        out_queue = config['filtered_images_queue_name']
-    else:
+    # Read log lines parse and write if ad
+    if not img:
+        in_queue = config['queue_name']
         out_queue = config['filtered_queue_name']
+        mq_reader = RMQiface(host, in_queue, usr, pwd)
+        mq_writer = RMQiface(host, out_queue, usr, pwd)
+        while True:
+            line = mq_reader.read()
+            if not line:
+                time.sleep(1.0)
+                if loop:
+                    continue
+                else:
+                    break
+            fields = line.split(' ||| ')
+            if da.check(fields[3]):
+                mq_writer.write(fields[3])
 
-    mq_reader = RMQiface(host, in_queue, usr, pwd)
-    mq_writer = RMQiface(host, out_queue, usr, pwd)
-
-    if img:
-        img_filter = is_ok_image
+    # Read urls and write if image and of sufficient size
     else:
-        img_filter = lambda url: True
-
-    while True:
-        line = mq_reader.read()
-        if not line:
-            time.sleep(1.0)
-            if loop:
-                continue
-            else:
-                break
-        fields = line.split(' ||| ')
-        if da.check(fields[3]) and img_filter(fields[3]):
-            mq_writer.write(fields[3])
+        in_queue = config['filtered_queue_name']
+        out_queue = config['filtered_images_queue_name']
+        mq_reader = RMQiface(host, in_queue, usr, pwd)
+        mq_writer = RMQiface(host, out_queue, usr, pwd)
+        while True:
+            line = mq_reader.read()
+            if not line:
+                time.sleep(1.0)
+                if loop:
+                    continue
+                else:
+                    break
+            if is_ok_image(line):
+                mq_writer.write(line)

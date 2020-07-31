@@ -16,12 +16,12 @@ def is_ok_image(url: str) -> bool:
     except Exception:
         return False
 
-da = DetectAds([
+blacklists = [
     'https://raw.githubusercontent.com/hectorm/hmirror/master/data/adaway.org/list.txt',
     'https://raw.githubusercontent.com/hectorm/hmirror/master/data/adblock-nocoin-list/list.txt',
     'https://raw.githubusercontent.com/hectorm/hmirror/master/data/easylist/list.txt',
     'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts',
-])
+]
 
 if __name__ == '__main__':
     loop = True
@@ -43,6 +43,8 @@ if __name__ == '__main__':
 
     # Read log lines parse and write if ad
     if not img:
+        da = DetectAds(blacklists)
+        print('filtering ads from log...')
         in_queue = config['queue_name']
         out_queue = config['filtered_queue_name']
         mq_reader = RMQiface(host, in_queue, usr, pwd)
@@ -61,6 +63,7 @@ if __name__ == '__main__':
 
     # Read urls and write if image and of sufficient size
     else:
+        print('filtering images from urls...')
         in_queue = config['filtered_queue_name']
         out_queue = config['filtered_images_queue_name']
         mq_reader = RMQiface(host, in_queue, usr, pwd)
